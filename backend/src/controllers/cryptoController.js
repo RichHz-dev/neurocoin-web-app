@@ -1,5 +1,6 @@
 const Crypto = require('../models/Crypto');
 
+// Obtener las y la crypto moneda => FRONTEND
 const getCryptos = async (req, res) => {
   try {
     const cryptos = await Crypto.find({});

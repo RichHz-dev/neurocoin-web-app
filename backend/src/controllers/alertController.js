@@ -18,7 +18,7 @@ const createAlert = async (req, res) => {
   }
 };
 
-// RUTAS SOLO PARA INFO DEL BACKEND
+ 
 const getAlerts = async (req, res) => {
   try {
     // En el futuro, aquí filtrarías por el ID del usuario autenticado: { userId: req.user.id }
@@ -29,7 +29,7 @@ const getAlerts = async (req, res) => {
   }
 };
 
-// 2. ELIMINAR / CANCELAR UNA ALERTA
+
 const deleteAlert = async (req, res) => {
   try {
     const { id } = req.params;
