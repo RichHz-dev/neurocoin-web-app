@@ -6,6 +6,7 @@ const cryptoRoutes = require('./routes/cryptoRoutes');
 const alertRoutes = require('./routes/alertRoutes');
 const aiRoutes = require('./routes/aiRoutes');
 const scenarioRoutes = require('./routes/scenarioRoutes'); 
+const advisorRoutes = require('./routes/advisorRoutes');
 const { runMarketEngine } = require('./services/marketService');
 // const seedSupportedCryptos = require('./config/seed');
 
@@ -20,8 +21,10 @@ connectDB();
 // Registro de Rutas
 app.use('/api/cryptos', cryptoRoutes);
 app.use('/api/alerts', alertRoutes);
-app.use('/api/ai', aiRoutes);                   // Probamos el agente de IA
+app.use('/api/ai', aiRoutes);                     // Probamos el agente de IA
 app.use('/api/scenarios', scenarioRoutes); 
+app.use('/api/advisor', advisorRoutes);           // Asesor de IA
+
 
 const PORT = process.env.PORT || 5000;
 

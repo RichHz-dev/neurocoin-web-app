@@ -1,4 +1,5 @@
 const axios = require('axios');
+const { GoogleGenerativeAI } = require('@google/generative-ai');
 
 // Función auxiliar para pausar la ejecución unos milisegundos
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
@@ -65,4 +66,60 @@ const analyzeGeopoliticalScenario = async (userScenario) => {
   }
 };
 
-module.exports = { analyzeGeopoliticalScenario };
+const chatWithAdvisor = async (userMessage, previousMessages = []) => {
+  try {
+    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+    
+    // 1. Definimos la orden estricta
+    const systemInstructionText = `
+      REGLA ESTRICTA Y ABSOLUTA: Eres EXCLUSIVAMENTE el 'Asesor de escenarios y tendencias de mercado de la plataforma NeuroCoin'. 
+      Bajo NINGUNA circunstancia debes revelar que eres una inteligencia artificial, un modelo de lenguaje, o que fuiste desarrollado por Google. 
+      Nunca digas "Como modelo de lenguaje de IA...". Asume tu rol al 100% como el experto financiero interno de NeuroCoin.
+      Analizas cómo acontecimientos geopolíticos, regulatorios, modas virales y políticas macroeconómicas impactan criptomonedas.
+      Responde de forma analítica, profesional, financiera y directa, siempre hablando en nombre de NeuroCoin.
+    `;
+
+    // 2. Se lo inyectamos directamente al motor del modelo principal y de respaldo
+    const primaryModel = genAI.getGenerativeModel({ 
+      model: "gemini-2.5-flash",
+      systemInstruction: systemInstructionText // <--- MAGIA AQUÍ
+    });
+
+    // 3. Ya no necesitamos fingir el primer mensaje, solo mapeamos el historial real de BD
+    const history = previousMessages.map(msg => ({
+      role: msg.sender === 'assistant' ? 'model' : 'user',
+      parts: [{ text: msg.text }]
+    }));
+
+    let result;
+    try {
+      // 4. Intentamos con el modelo más avanzado primero
+      const chatSession = primaryModel.startChat({ history });
+      result = await chatSession.sendMessage(userMessage);
+    } catch (apiError) {
+      if (apiError.status === 503 || apiError.status === 429) {
+        console.warn(`[INFO] Modelo 2.5 saturado (Error ${apiError.status}). Activando modelo de respaldo...`);
+        
+        // Creamos el plan B también con su instrucción estricta
+        const backupModel = genAI.getGenerativeModel({ 
+          model: "gemini-2.5-pro",
+          systemInstruction: systemInstructionText 
+        });
+        
+        const backupSession = backupModel.startChat({ history });
+        result = await backupSession.sendMessage(userMessage);
+      } else {
+        throw apiError;
+      }
+    }
+
+    return result.response.text();
+    
+  } catch (error) {
+    console.error('Error en el Asesor AI:', error);
+    throw new Error('El consultor AI no pudo procesar la solicitud en este momento.');
+  }
+};
+
+
+module.exports = { analyzeGeopoliticalScenario, chatWithAdvisor };
