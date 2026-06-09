@@ -1,4 +1,4 @@
-CRYPTOS
+CRYPTOSss
 Guarda el estado actual del mercado de las criptomonedas seleccionadas. Evita depender      exclusivamente del estado en memoria volátil del servidor Express y permite recopilar históricos exactos.
 {
   "_id": "ObjectId",
