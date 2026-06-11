@@ -88,9 +88,7 @@ const runScenarioSimulation = async (req, res) => {
     
     const aiConclusion = await analyzeGeopoliticalScenario(fullPromptContext);
 
-    // ◄ ACTUALIZADO: Guardamos la simulación mapeando el usuario si existe
     const savedSimulation = new HistorySimulation({
-      userId: userId || undefined, // Si no hay userId en el body, Mongoose usa el default ('invitado_neurocoin')
       coinId,
       symbol: cryptoData.symbol,
       contextType,
@@ -106,7 +104,6 @@ const runScenarioSimulation = async (req, res) => {
 
     return res.status(200).json({
       simulationId: savedSimulation._id,
-      userId: savedSimulation.userId, // Le confirmamos al front a qué usuario se asignó
       asset: { symbol: cryptoData.symbol, currentPrice },
       simulationInputs: { contextType, expectedImpact, description },
       estimatedCurve,
@@ -119,4 +116,17 @@ const runScenarioSimulation = async (req, res) => {
   }
 };
 
-module.exports = { getScenarios, createScenario, runScenarioSimulation };
+// Historial global de las simulaciones hechas
+const getGlobalHistory = async (req, res) => {
+  try {
+    // Trae las últimas 10 simulaciones hechas en toda la plataforma
+    const history = await HistorySimulation.find()
+                                           .sort({ createdAt: -1 })
+                                           .limit(10);
+    res.status(200).json(history);
+  } catch (error) {
+    res.status(500).json({ error: 'No se pudo obtener el historial' });
+  }
+};
+
+module.exports = { getScenarios, createScenario, runScenarioSimulation, getGlobalHistory };
