@@ -21,7 +21,7 @@ const analyzeGeopoliticalScenario = async (userScenario) => {
     2. **IMPACTO POR ACTIVO**: Detalla en viñetas cortas cómo reaccionarían las monedas de la plataforma.
     3. **DICTAMEN DE VOLATILIDAD**: Clasifica la tendencia final en una de estas etiquetas: [ALCISTA EXTREMA], [BAJISTA], [ALTA VOLATILIDAD INDETERMINADA] o [NEUTRAL].
     
-    Sé analítico, profesional y directo. Concluye siempre todas tus ideas, no dejes párrafos a medias.
+    REGLA ESTRICTA: Sé analítico, profesional, CONCISO y directo. Limita tu análisis a un máximo de 300 palabras. Concluye de forma contundente y NUNCA dejes párrafos a medias.
   `;
 
   const requestBody = {
@@ -29,7 +29,7 @@ const analyzeGeopoliticalScenario = async (userScenario) => {
     systemInstruction: { parts: [{ text: systemInstruction }] },
     generationConfig: {
       temperature: 0.7,
-      maxOutputTokens: 1500 
+      maxOutputTokens: 3000 // Subimos el límite al doble para evitar bloqueos por longitud
     }
   };
 

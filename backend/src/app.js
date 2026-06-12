@@ -45,5 +45,5 @@ app.listen(PORT, async () => {
   // Tarea automatizada: Consulta a Binance cada 10 segundos para actualizar precios y sparklines
   setInterval(async () => {
     await runMarketEngine();
-  }, 10000);
+  }, 4000);
 });
