@@ -47,7 +47,7 @@ const fetchAndUpdateMarketData = async () => {
             low24h: parseFloat(ticker.lowPrice),
             volatilityElasticity: elasticity
           },
-          $push: { sparkline: { $each: [currentPrice], $slice: -10 } }
+          $push: { sparkline: { $each: [currentPrice], $slice: -5 } }
         },
         { upsert: true, returnDocument: 'after' }
       );
