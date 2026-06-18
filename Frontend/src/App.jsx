@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import CryptoPanel from './components/CryptoPanel.jsx';
 import ScenarioPanel from './components/ScenarioPanel.jsx';
 import AssistantPanel from './components/AssistantPanel.jsx';
@@ -10,6 +10,8 @@ const SESSION_ID = `session_${Date.now()}_${Math.random().toString(36).slice(2, 
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('cryptos');
+
+  const [refreshInterval, setRefreshInterval] = useState(10000); // 10 segundos
 
   const [cryptos, setCryptos] = useState([]);
   const [selectedCoin, setSelectedCoin] = useState(null);
@@ -73,9 +75,9 @@ export default function App() {
 
   useEffect(() => {
     fetchMarketData();
-    const interval = setInterval(fetchMarketData, 10000); // coincide con el intervalo del backend
+    const interval = setInterval(fetchMarketData, refreshInterval); // coincide con el intervalo del backend
     return () => clearInterval(interval);
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [refreshInterval]); // eslint-disable-line react-hooks/exhaustive-deps
 
 
   // ─── Notificaciones flotantes ─────────────────────────────────────────────
@@ -297,7 +299,6 @@ export default function App() {
             <Info className="w-3.5 h-3.5 text-pink-400" />
             <span>NeuroCoin Scenario Predictor Platform © 2026. Todos los derechos reservados.</span>
           </div>
-          <span>Backend: localhost:5000 | Frontend: Vite Dev Server</span>
         </div>
       </footer>
     </div>
