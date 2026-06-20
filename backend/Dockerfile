@@ -18,3 +18,8 @@ EXPOSE 5000
 
 # Comando para inciar la aplicacion
 CMD ["npm", "start"]
+
+
+
+
+

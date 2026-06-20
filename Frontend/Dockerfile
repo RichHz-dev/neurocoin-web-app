@@ -29,3 +29,5 @@ EXPOSE 80
 
 # Comando para encender el servidor Nginx y mantenerlo corriendo
 CMD ["nginx", "-g", "daemon off;"]
+
+
