@@ -1,11 +1,10 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import {
   Globe, ShieldAlert, Sparkles, RefreshCw, Landmark, HelpCircle, Activity,
 } from 'lucide-react';
 import api from '../services/api.js';
 
 // Mapeo de los tipos de escenario del frontend al enum que espera el backend
-// Backend enum: ['geografico', 'politico', 'social', 'economico']
 const CONTEXT_TYPE_MAP = {
   geographic: 'geografico',
   political: 'politico',
@@ -14,7 +13,6 @@ const CONTEXT_TYPE_MAP = {
 };
 
 // Mapeo del impacto del frontend al enum del backend
-// Backend enum: ['alcista', 'bajista', 'volatil']
 const IMPACT_MAP = {
   bullish: 'alcista',
   bearish: 'bajista',
@@ -22,6 +20,10 @@ const IMPACT_MAP = {
 };
 
 export default function ScenarioPanel({ cryptos, selectedCoin, triggerNotification }) {
+  // Estado local para la moneda a simular (toma la seleccionada globalmente por defecto)
+  const [targetCoinId, setTargetCoinId] = useState('');
+  const activeCoin = cryptos?.find(c => c.coinId === targetCoinId) || selectedCoin;
+
   const [selectedScenarioId, setSelectedScenarioId] = useState('sec-1');
   const [customDescription, setCustomDescription] = useState('');
   const [customType, setCustomType] = useState('political');
@@ -30,10 +32,9 @@ export default function ScenarioPanel({ cryptos, selectedCoin, triggerNotificati
 
   const [isSimulating, setIsSimulating] = useState(false);
 
-  // El backend devuelve: { estimatedCurve, fluctuationChannel, aiConclusion, asset }
-  const [simCurve, setSimCurve] = useState(null);           // estimatedCurve: [{ hour, price, percentageChange }]
-  const [simChannel, setSimChannel] = useState(null);       // fluctuationChannel: [{ hour, confidence, range }]
-  const [simCommentary, setSimCommentary] = useState('');   // aiConclusion
+  const [simCurve, setSimCurve] = useState(null);
+  const [simChannel, setSimChannel] = useState(null);
+  const [simCommentary, setSimCommentary] = useState('');
 
   const predefinedScenarios = [
     {
@@ -89,12 +90,9 @@ export default function ScenarioPanel({ cryptos, selectedCoin, triggerNotificati
   const currentScenario =
     predefinedScenarios.find((s) => s.id === selectedScenarioId) || predefinedScenarios[0];
 
-  // ─── Ejecución de simulación ──────────────────────────────────────────────
-  // POST /api/scenarios/simulate requiere:
-  //   { coinId, contextType (enum backend), expectedImpact (enum backend), description }
   const triggerSimulation = async () => {
-    if (!selectedCoin) {
-      triggerNotification('Por favor, selecciona primero una moneda virtual en el panel de Monitoreo.');
+    if (!activeCoin) {
+      triggerNotification('Por favor, selecciona una moneda virtual válida.');
       return;
     }
 
@@ -111,8 +109,7 @@ export default function ScenarioPanel({ cryptos, selectedCoin, triggerNotificati
         : customDescription || 'Simulación personalizada de evento global sin descripción proporcionada.';
 
     const payload = {
-      coinId: selectedCoin.coinId,
-      // Convertir al enum que valida el schema de Mongoose
+      coinId: activeCoin.coinId,
       contextType: CONTEXT_TYPE_MAP[frontendType] || 'economico',
       expectedImpact: IMPACT_MAP[frontendImpact] || 'volatil',
       description,
@@ -126,7 +123,7 @@ export default function ScenarioPanel({ cryptos, selectedCoin, triggerNotificati
         setSimChannel(data.fluctuationChannel || []);
         setSimCommentary(data.aiConclusion || '');
         triggerNotification(
-          `¡Simulación exitosa para ${selectedCoin.name}! Impacto computado: ${payload.expectedImpact}.`
+          `¡Simulación exitosa para ${activeCoin.name}! Impacto computado: ${payload.expectedImpact}.`
         );
       }
     } catch (err) {
@@ -185,13 +182,26 @@ export default function ScenarioPanel({ cryptos, selectedCoin, triggerNotificati
           </div>
 
           <p className="text-xs text-slate-400 leading-relaxed mb-4">
-            Configura y simula el impacto de eventos macroeconómicos, crisis geográficas, pautas
-            regulatorias o tendencias de redes sobre{' '}
-            <span className="text-indigo-400 font-bold font-mono">
-              {selectedCoin?.name || 'la moneda seleccionada'}
-            </span>
-            .
+            Configura y simula el impacto de eventos macroeconómicos o regulatorios sobre el activo seleccionado.
           </p>
+
+          {/* NUEVO: Selector de Criptomoneda Independiente */}
+          <div className="mb-4">
+            <label className="text-[10px] text-slate-400 font-mono tracking-wider uppercase block mb-1">
+              Activo a Simular:
+            </label>
+            <select
+              value={activeCoin?.coinId || ''}
+              onChange={(e) => setTargetCoinId(e.target.value)}
+              className="w-full bg-slate-950 border border-slate-800 text-xs text-slate-200 rounded-lg p-2 focus:outline-none focus:border-indigo-500 font-mono"
+            >
+              {cryptos?.map((coin) => (
+                <option key={coin.coinId} value={coin.coinId}>
+                  {coin.name} ({coin.symbol})
+                </option>
+              ))}
+            </select>
+          </div>
 
           {/* Toggle predefinido / personalizado */}
           <div className="flex bg-slate-950 p-1 rounded-xl gap-1 mb-4">
@@ -211,7 +221,7 @@ export default function ScenarioPanel({ cryptos, selectedCoin, triggerNotificati
           </div>
 
           {activeTab === 'predefined' ? (
-            <div className="space-y-2 max-h-[280px] overflow-y-auto pr-1">
+            <div className="space-y-2 max-h-[220px] overflow-y-auto pr-1">
               {predefinedScenarios.map((sc) => {
                 const isSelected = selectedScenarioId === sc.id;
                 return (
@@ -330,10 +340,10 @@ export default function ScenarioPanel({ cryptos, selectedCoin, triggerNotificati
             <h3 className="text-sm font-semibold text-slate-350 tracking-wider uppercase font-mono">
               Resultado Proyectado
             </h3>
-            {selectedCoin ? (
+            {activeCoin ? (
               <span className="text-[10px] px-2 py-0.5 bg-indigo-500/10 border border-indigo-500/30 text-indigo-300 font-mono uppercase rounded">
-                Activo: {selectedCoin.symbol} ($&nbsp;
-                {selectedCoin.price?.toLocaleString(undefined, { maximumFractionDigits: 2 })})
+                Activo: {activeCoin.symbol} ($&nbsp;
+                {activeCoin.price?.toLocaleString(undefined, { maximumFractionDigits: 2 })})
               </span>
             ) : (
               <span className="text-[10px] px-2 py-0.5 bg-rose-500/10 border border-rose-500/20 text-rose-400 font-mono uppercase rounded">
@@ -372,7 +382,6 @@ export default function ScenarioPanel({ cryptos, selectedCoin, triggerNotificati
           {!isSimulating && simCurve && (
             <div className="space-y-5 animate-fade-in">
               {/* Tabla de curva estimada */}
-              {/* estimatedCurve: [{ hour, price, percentageChange }] */}
               <div>
                 <h4 className="text-[10px] text-slate-400 font-mono tracking-wider uppercase mb-2">
                   Curva Futura Estimada (T+1h a T+6h):
@@ -388,7 +397,7 @@ export default function ScenarioPanel({ cryptos, selectedCoin, triggerNotificati
                         <span className="text-[10px] font-mono text-slate-500 block">{p.hour}</span>
                         <span className="text-xs font-bold text-slate-200 block font-mono mt-1">
                           ${p.price?.toLocaleString(undefined, {
-                            maximumFractionDigits: (selectedCoin?.price ?? 0) > 100 ? 1 : 4,
+                            maximumFractionDigits: (activeCoin?.price ?? 0) > 100 ? 1 : 4,
                           })}
                         </span>
                         <span
@@ -406,7 +415,6 @@ export default function ScenarioPanel({ cryptos, selectedCoin, triggerNotificati
               </div>
 
               {/* Canal de fluctuación */}
-              {/* fluctuationChannel: [{ hour, confidence, range }] */}
               {simChannel && simChannel.length > 0 && (
                 <div className="bg-slate-950/40 border border-slate-850 p-3 rounded-xl">
                   <span className="text-[10px] text-slate-500 font-mono uppercase block mb-2">
@@ -436,7 +444,7 @@ export default function ScenarioPanel({ cryptos, selectedCoin, triggerNotificati
                 </div>
               )}
 
-              {/* Conclusión del oráculo - CORREGIDA CON SCROLL */}
+              {/* Conclusión del oráculo - CORREGIDA CON SCROLL Y LIMPIEZA DE MARKDOWN */}
               <div className="bg-slate-950/80 border border-slate-800 p-4 rounded-xl flex items-start gap-3.5 shadow-md">
                 <div className="p-2.5 bg-pink-500/10 text-pink-400 rounded-lg shrink-0">
                   <Sparkles className="w-5 h-5 text-pink-400 animate-pulse" />
@@ -445,10 +453,10 @@ export default function ScenarioPanel({ cryptos, selectedCoin, triggerNotificati
                   <h4 className="text-[10px] font-bold text-pink-400 tracking-widest uppercase font-mono mb-2">
                     Conclusión de Inteligencia Escenarios (Gemini Engine)
                   </h4>
-                  {/* Aquí añadimos el max-height, overflow-y-auto y algo de padding */}
                   <div className="max-h-[160px] overflow-y-auto pr-2">
                     <p className="text-xs text-slate-200 leading-relaxed font-sans whitespace-pre-line">
-                      {simCommentary}
+                      {/* ◄ Reemplazamos los asteriscos dobles y simples del markdown para dejar puro texto */}
+                      {simCommentary.replace(/\*\*/g, '').replace(/\*/g, '')}
                     </p>
                   </div>
                 </div>

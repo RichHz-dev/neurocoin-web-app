@@ -4,7 +4,6 @@ const SupportedCrypto = require('../models/SupportedCrypto');
 
 const fetchAndUpdateMarketData = async () => {
   try {
-    console.log('[INFO] Sincronizando datos dinámicos con Binance...');
     
     // Obtener la lista de monedas soportadas desde la DB
     const supportedList = await SupportedCrypto.find({});
@@ -52,7 +51,6 @@ const fetchAndUpdateMarketData = async () => {
         { upsert: true, returnDocument: 'after' }
       );
     }
-    console.log('[INFO] Base de datos dinámica actualizada');
   } catch (error) {
     console.error('[ERROR] En la actualización dinámica:', error.message);
   }

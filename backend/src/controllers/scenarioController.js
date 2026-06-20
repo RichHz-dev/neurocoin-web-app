@@ -2,6 +2,7 @@ const Crypto = require('../models/Crypto');
 const Scenario = require('../models/Scenario');
 const HistorySimulation = require('../models/HistorySimulation');
 const { analyzeGeopoliticalScenario } = require('../services/geminiService');
+const axios = require('axios');
 
 // Obtener escenarios (predefinidos) => ADMIN
 const getScenarios = async (req, res) => {
@@ -17,7 +18,7 @@ const getScenarios = async (req, res) => {
 const createScenario = async (req, res) => {
   try {
     const { title, type, impact, description } = req.body;
-    
+
     if (!title || !type || !impact || !description) {
       return res.status(400).json({ message: 'Todos los campos son obligatorios para guardar el escenario.' });
     }
@@ -45,69 +46,57 @@ const runScenarioSimulation = async (req, res) => {
     const cryptoData = await Crypto.findOne({ coinId });
     if (!cryptoData) return res.status(404).json({ message: 'Moneda no encontrada.' });
 
-    const currentPrice = cryptoData.price;
-    const estimatedCurve = [];
-    const fluctuationChannel = [];
-    
-    let impactMultiplier = 0;
-    if (expectedImpact === 'ALCISTA' || expectedImpact === 'alcista') impactMultiplier = 0.025;
-    if (expectedImpact === 'BAJISTA' || expectedImpact === 'bajista') impactMultiplier = -0.035;
-    if (expectedImpact === 'VOLÁTIL' || expectedImpact === 'volatil') impactMultiplier = 0.005;
-
-    let runningPrice = currentPrice;
-    let baseConfidence = 85;
-
-    for (let h = 1; h <= 6; h++) {
-      const randomness = (Math.random() - 0.5) * 0.01;
-      const hourlyChange = impactMultiplier + randomness;
+    let mlData;
+    try {
+      const pythonPayload = {
+        context_type: contextType,
+        expected_impact: expectedImpact,
+        event_description: description
+      };
       
-      runningPrice = runningPrice * (1 + hourlyChange);
-      const totalPercentageFromStart = ((runningPrice - currentPrice) / currentPrice) * 100;
-
-      estimatedCurve.push({
-        hour: `T+${h}h`,
-        price: parseFloat(runningPrice.toFixed(2)),
-        percentageChange: parseFloat(totalPercentageFromStart.toFixed(1))
-      });
-
-      fluctuationChannel.push({
-        hour: `T+${h}h`,
-        confidence: baseConfidence,
-        range: parseFloat((Math.abs(hourlyChange * 15) + 4).toFixed(1))
-      });
-
-      baseConfidence -= 5;
+      console.log(`\n🚀 [NODE] Enviando payload a Python (http://127.0.0.1:8000/predict/scenario/${cryptoData.symbol}):`);
+      console.log(pythonPayload);
+      
+      const pythonResponse = await axios.post(`http://127.0.0.1:8000/predict/scenario/${cryptoData.symbol}`, pythonPayload);
+      mlData = pythonResponse.data;
+    } catch (pythonError) {
+      console.error('[ML Service Error]:', pythonError.message);
+      return res.status(503).json({ message: 'El motor de Machine Learning no está disponible en este momento.' });
     }
 
+    // 2. LLAMADA A GEMINI (Oráculo Analítico Cualitativo)
     const fullPromptContext = `
       [CONTEXTO MÓDULO SIMULADOR]: El usuario está simulando un evento de tipo "${contextType}" sobre la moneda ${cryptoData.name}.
       [IMPACTO ESPERADO]: ${expectedImpact}.
+      [MÉTRICAS ML]: Sentimiento NLP calculado: ${mlData.metrics.nlp_sentiment_score}. Volatilidad base: ${mlData.metrics.volatility_base}.
       [DESCRIPCIÓN DEL EVENTO]: "${description}"
       Genera la conclusión analítica compacta en un solo párrafo para NeuroCoin.
     `;
     
     const aiConclusion = await analyzeGeopoliticalScenario(fullPromptContext);
 
+    // 3. GUARDAR HISTORIAL
     const savedSimulation = new HistorySimulation({
       coinId,
       symbol: cryptoData.symbol,
       contextType,
       expectedImpact,
       description,
-      initialPrice: currentPrice,
-      estimatedCurve,
-      fluctuationChannel,
+      initialPrice: cryptoData.price,
+      estimatedCurve: mlData.estimatedCurve,
+      fluctuationChannel: mlData.fluctuationChannel,
       aiConclusion
     });
 
     await savedSimulation.save();
 
+    // 4. DEVOLVER RESPUESTA AL FRONTEND
     return res.status(200).json({
       simulationId: savedSimulation._id,
-      asset: { symbol: cryptoData.symbol, currentPrice },
+      asset: { symbol: cryptoData.symbol, currentPrice: cryptoData.price },
       simulationInputs: { contextType, expectedImpact, description },
-      estimatedCurve,
-      fluctuationChannel,
+      estimatedCurve: mlData.estimatedCurve,
+      fluctuationChannel: mlData.fluctuationChannel,
       aiConclusion
     });
 
@@ -115,14 +104,13 @@ const runScenarioSimulation = async (req, res) => {
     return res.status(500).json({ message: 'Error en la simulación', error: error.message });
   }
 };
-
 // Historial global de las simulaciones hechas
 const getGlobalHistory = async (req, res) => {
   try {
     // Trae las últimas 10 simulaciones hechas en toda la plataforma
     const history = await HistorySimulation.find()
-                                           .sort({ createdAt: -1 })
-                                           .limit(10);
+      .sort({ createdAt: -1 })
+      .limit(10);
     res.status(200).json(history);
   } catch (error) {
     res.status(500).json({ error: 'No se pudo obtener el historial' });
