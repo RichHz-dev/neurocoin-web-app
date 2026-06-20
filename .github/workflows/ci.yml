@@ -1,0 +1,35 @@
+name: Integración Continua (CI) - Neurocoin
+
+# ¿Cuándo debe ejecutarse este robot?
+on:
+  push:
+    branches: [ "**" ] # Cada vez que alguien haga push a cualquier rama
+  pull_request:
+    branches: [ "main", "master" ]
+
+jobs:
+  build-and-test:
+    # GitHub nos prestará una computadora virtual con Ubuntu
+    runs-on: ubuntu-latest
+
+    steps:
+    # 1. Descargar el código de tu repositorio
+    - name: Obtener el código
+      uses: actions/checkout@v4
+
+    # 2. Inyectar las variables reales desde github secrets
+    - name: Crear archivo .env con credenciales reales
+      run: |
+        echo "${{ secrets.ENV_BACKEND }}" > ./backend/.env
+
+    # 3. Simular que estamos en tu laptop y construir las imágenes
+    - name: Construir imágenes de Docker
+      run: docker compose build
+
+    # 4. Encender los contenedores para comprobar que no explotan
+    - name: Probar arranque de contenedores
+      run: docker compose up -d
+
+    # 5. Apagar y limpiar la computadora prestada
+    - name: Limpiar entorno
+      run: docker compose down
