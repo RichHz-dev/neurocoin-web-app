@@ -17,14 +17,19 @@ jobs:
     - name: Obtener el código
       uses: actions/checkout@v4
 
-    # 2. Simular que estamos en tu laptop y construir las imágenes
+    # 2. Inyectar las variables reales desde github secrets
+    - name: Crear archivo .env con credenciales reales
+      run: |
+        echo "${{ secrets.ENV_BACKEND }}" > ./backend/.env
+
+    # 3. Simular que estamos en tu laptop y construir las imágenes
     - name: Construir imágenes de Docker
       run: docker-compose build
 
-    # 3. Encender los contenedores para comprobar que no explotan
+    # 4. Encender los contenedores para comprobar que no explotan
     - name: Probar arranque de contenedores
       run: docker-compose up -d
 
-    # 4. Apagar y limpiar la   computadora prestada
+    # 5. Apagar y limpiar la computadora prestada
     - name: Limpiar entorno
       run: docker-compose down
