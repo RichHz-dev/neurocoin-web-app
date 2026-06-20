@@ -24,12 +24,12 @@ jobs:
 
     # 3. Simular que estamos en tu laptop y construir las imágenes
     - name: Construir imágenes de Docker
-      run: docker-compose build
+      run: docker compose build
 
     # 4. Encender los contenedores para comprobar que no explotan
     - name: Probar arranque de contenedores
-      run: docker-compose up -d
+      run: docker compose up -d
 
     # 5. Apagar y limpiar la computadora prestada
     - name: Limpiar entorno
-      run: docker-compose down
+      run: docker compose down
