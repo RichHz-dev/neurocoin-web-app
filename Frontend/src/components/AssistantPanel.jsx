@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Send, Sparkles, Terminal, BookOpen, Layers } from 'lucide-react';
 
 export default function AssistantPanel({
@@ -26,15 +26,15 @@ export default function AssistantPanel({
 
   const handlePredefinedQuery = (query) => {
     if (isChatLoading) return;
-    triggerNotification(`Consultando al arquitecto DevOps: "${query}"`);
+    triggerNotification(`Consultando al asesor experto...`);
     onSendMessage(query);
   };
 
   const sampleQueries = [
-    { label: 'Impacto Geopolítico', text: '¿De qué manera los conflictos transfronterizos o crisis energéticas alteran el precio de Bitcoin y el Hashrate de minería?' },
-    { label: 'Efecto de Regulaciones', text: '¿Qué impacto tienen las normativas restrictivas de bancos centrales y los cambios de la SEC sobre Ethereum y Ripple?' },
-    { label: 'Sentimiento e Influencers', text: '¿Cómo influyen los tweets de líderes de opinión como Elon Musk o las corrientes de Reddit en el pánico y volatilidad de Solana o Ripple?' },
-    { label: 'Políticas de la Fed', text: '¿Por qué las rebajas o alzas en las tasas de interés de la Fed redefinen los flujos de liquidez hacia activos virtuales?' }
+    { label: '¿Qué es Blockchain?', text: 'Explícame qué es la tecnología blockchain y cómo funciona de una manera sencilla para alguien que recién empieza.' },
+    { label: 'Estrategias de Inversión', text: '¿Cuáles son las estrategias de inversión más comunes en criptomonedas (como HODL o DCA) y sus riesgos?' },
+    { label: 'DeFi para Principiantes', text: '¿Qué son las finanzas descentralizadas (DeFi) y cómo puedo empezar a generar rendimientos pasivos de forma segura?' },
+    { label: 'Seguridad y Wallets', text: '¿Cuál es la diferencia entre una "hot wallet" y una "cold wallet", y cómo protejo mis activos?' }
   ];
 
   return (
@@ -43,21 +43,21 @@ export default function AssistantPanel({
       <div className="lg:col-span-4 bg-slate-900/80 border border-slate-800/60 rounded-2xl p-4 flex flex-col justify-between" id="side-card-chat">
         <div>
           <h3 className="text-sm font-semibold text-slate-300 uppercase tracking-widest font-mono mb-3 flex items-center gap-2">
-            <BookOpen className="text-pink-400 w-4 h-4" /> Asesor de Escenarios
+            <BookOpen className="text-pink-400 w-4 h-4" /> Asesor de Criptomonedas
           </h3>
           <p className="text-xs text-slate-400 leading-relaxed mb-4">
-            Interactúa con un modelo avanzado de Inteligencia Artificial que comprende cómo acontecimientos internacionales, tensiones de gobernanza global y el sentimiento social moldean el curso del ecosistema criptográfico.
+            Interactúa con nuestro experto virtual impulsado por IA. Ya seas principiante dando tus primeros pasos o profesional buscando estrategias avanzadas, resolveremos todas tus dudas sobre el ecosistema cripto.
           </p>
-          
+
           <div className="border-t border-slate-800/80 pt-3">
-            <span className="text-[10px] text-slate-500 font-mono uppercase font-bold tracking-wider block mb-2">Preguntas sugeridas:</span>
+            <span className="text-[10px] text-slate-500 font-mono uppercase font-bold tracking-wider block mb-2">Preguntas frecuentes:</span>
             <div className="space-y-1.5 max-h-[220px] overflow-y-auto pr-1">
               {sampleQueries.map((q, idx) => (
                 <button
-                   key={idx}
-                   onClick={() => handlePredefinedQuery(q.text)}
-                   disabled={isChatLoading}
-                   className="w-full text-left text-xs bg-slate-950 hover:bg-slate-850 disabled:bg-slate-950/40 text-slate-300 hover:text-white p-2.5 rounded-xl border border-slate-850 hover:border-slate-700/80 transition-all font-sans block text-ellipsis overflow-hidden"
+                  key={idx}
+                  onClick={() => handlePredefinedQuery(q.text)}
+                  disabled={isChatLoading}
+                  className="w-full text-left text-xs bg-slate-950 hover:bg-slate-850 disabled:bg-slate-950/40 text-slate-300 hover:text-white p-2.5 rounded-xl border border-slate-850 hover:border-slate-700/80 transition-all font-sans block text-ellipsis overflow-hidden"
                 >
                   🧩 {q.label}
                 </button>
@@ -69,7 +69,7 @@ export default function AssistantPanel({
         {/* Culture statement footer */}
         <div className="mt-5 border-t border-slate-850 pt-4 text-[10px] text-slate-500 font-mono leading-relaxed flex items-center gap-2">
           <Layers className="w-4 h-4 text-pink-500/85" />
-          <span>Macro & Sentiment Analysis: Vigilando la correlación de activos digitales.</span>
+          <span>Educación y Estrategia: Soporte experto para todos los niveles financieros.</span>
         </div>
       </div>
 
@@ -90,11 +90,10 @@ export default function AssistantPanel({
                 <div className={`p-2 rounded-lg shrink-0 ${isAI ? 'bg-pink-550/10 text-pink-400' : 'bg-slate-900 text-pink-400'}`}>
                   {isAI ? <Sparkles className="w-4 h-4" /> : <Terminal className="w-4 h-4" />}
                 </div>
-                <div className={`rounded-xl p-3 text-xs leading-relaxed ${
-                  isAI
+                <div className={`rounded-xl p-3 text-xs leading-relaxed ${isAI
                     ? 'bg-slate-900/60 border border-slate-800 text-slate-200'
                     : 'bg-gradient-to-r from-pink-700 to-indigo-700 text-white select-text font-medium'
-                }`}>
+                  }`}>
                   <p className="whitespace-pre-line">{msg.text}</p>
                   <span className={`text-[8px] block mt-1.5 ${isAI ? 'text-slate-500 text-left' : 'text-indigo-250 text-right'}`}>
                     {msg.timestamp}
@@ -110,7 +109,7 @@ export default function AssistantPanel({
                 <Sparkles className="w-4 h-4 animate-spin-slow" />
               </div>
               <div className="bg-slate-900/60 border border-slate-800 rounded-xl p-3 text-xs text-slate-500 font-mono">
-                El consultor AI está componiendo un reporte del mercado y geopolítica...
+                El consultor AI está preparando tu respuesta...
               </div>
             </div>
           )}
@@ -123,7 +122,7 @@ export default function AssistantPanel({
             value={inputText}
             onChange={(e) => setInputText(e.target.value)}
             disabled={isChatLoading}
-            placeholder={isChatLoading ? 'Espere la respuesta...' : 'Consúltame sobre regulaciones de la SEC, tweets virales, tasas de interés, minería...'}
+            placeholder={isChatLoading ? 'Espere la respuesta...' : 'Haz tu pregunta sobre criptomonedas, blockchain, trading, etc...'}
             className="flex-1 bg-slate-900 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-slate-200 focus:outline-none focus:border-indigo-500 placeholder:text-slate-600"
           />
           <button

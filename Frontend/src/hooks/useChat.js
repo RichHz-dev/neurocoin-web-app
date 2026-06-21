@@ -9,7 +9,7 @@ export function useChat() {
     {
       id: 'w1',
       sender: 'assistant',
-      text: '🤖 ¡Hola! Soy el asesor de escenarios y tendencias de mercado de NeuroCoin.\n\nEstoy aquí para analizar cómo acontecimientos geopolíticos, decisiones regulatorias nacionales (como regulaciones de la SEC o de la UE), las corrientes y modas virales de redes sociales, o los recortes de tasas de interés de la Fed impactan sobre los precios de Bitcoin, Ethereum, Solana, Cardano y Ripple.\n\n¿Qué escenario global o caso de contingencia te gustaría explorar o simular hoy?',
+      text: '🤖 ¡Hola! Soy el Asesor General de Criptomonedas de NeuroCoin.\n\nEstoy aquí para ayudarte a comprender el mundo de los activos digitales. Ya sea que estés dando tus primeros pasos y quieras entender cómo funciona Blockchain o una Wallet, o si eres un usuario experimentado buscando discutir estrategias de inversión y DeFi.\n\n¿En qué te puedo ayudar hoy?',
       timestamp: new Date().toLocaleTimeString(),
     },
   ]);
