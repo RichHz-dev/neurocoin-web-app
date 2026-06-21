@@ -56,22 +56,21 @@ const getCryptoHistory = async (req, res) => {
 
 const runTechnicalForecast = async (req, res) => {
   try {
-    const { coinId, timeframe } = req.body;
+    const { coinId } = req.body;
     const cryptoData = await Crypto.findOne({ coinId });
     if (!cryptoData) return res.status(404).json({ message: 'Moneda no encontrada' });
 
-    const pythonResponse = await axios.post(`http://127.0.0.1:8000/predict/forecast/${cryptoData.symbol}`, { timeframe });
+    const pythonResponse = await axios.post(`http://127.0.0.1:8000/predict/forecast/${cryptoData.symbol}`);
     const mlData = pythonResponse.data;
 
-    const prompt = `Analiza técnicamente el activo ${cryptoData.name} (${cryptoData.symbol}) en un gráfico temporal de ${timeframe}. 
-    La red neuronal proyecta una tendencia técnica ${mlData.trend}. Precio actual: $${cryptoData.price}. 
-    Redacta una conclusión técnica, directa y compacta en un solo párrafo. PROHIBIDO usar asteriscos, negritas o formato markdown.`;
+    const prompt = `Analiza técnicamente el activo ${cryptoData.name} (${cryptoData.symbol}). 
+    La red neuronal proyecta una tendencia técnica general ${mlData.trend}. Precio actual: $${cryptoData.price}. 
+    Redacta una conclusión técnica a corto y mediano plazo, directa y compacta en un solo párrafo. PROHIBIDO usar asteriscos, negritas o formato markdown.`;
     
     const aiConclusion = await analyzeGeopoliticalScenario(prompt);
 
     return res.status(200).json({
-      estimatedCurve: mlData.estimatedCurve,
-      fluctuationChannel: mlData.fluctuationChannel,
+      predictions: mlData.predictions,
       aiConclusion: aiConclusion.replace(/\*/g, '') 
     });
 
