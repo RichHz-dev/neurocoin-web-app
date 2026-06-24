@@ -54,10 +54,11 @@ const runScenarioSimulation = async (req, res) => {
         event_description: description
       };
       
-      console.log(`\n🚀 [NODE] Enviando payload a Python (http://127.0.0.1:8000/predict/scenario/${cryptoData.symbol}):`);
-      console.log(pythonPayload);
-      
-      const pythonResponse = await axios.post(`http://127.0.0.1:8000/predict/scenario/${cryptoData.symbol}`, pythonPayload);
+      const AI_SERVICE_URL = process.env.AI_SERVICE_URL || 'http://127.0.0.1:8000';
+      console.log(`\n🚀 [NODE] Enviando payload a Python (${AI_SERVICE_URL}/predict/scenario/${cryptoData.symbol}):`);
+      console.log(JSON.stringify(pythonPayload, null, 2));
+
+      const pythonResponse = await axios.post(`${AI_SERVICE_URL}/predict/scenario/${cryptoData.symbol}`, pythonPayload);
       mlData = pythonResponse.data;
     } catch (pythonError) {
       console.error('[ML Service Error]:', pythonError.message);

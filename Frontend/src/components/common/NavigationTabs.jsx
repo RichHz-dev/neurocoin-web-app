@@ -4,7 +4,7 @@ export default function NavigationTabs({ activeTab, setActiveTab }) {
   const tabs = [
     { id: 'cryptos', icon: <Zap className="w-4 h-4" />, label: 'Monitoreo & ML (LSTM)' },
     { id: 'scenarios', icon: <Globe className="w-4 h-4" />, label: 'Simulador de Escenarios' },
-    { id: 'chat', icon: <MessageSquare className="w-4 h-4" />, label: 'Asesor de Escenarios IA' },
+    { id: 'chat', icon: <MessageSquare className="w-4 h-4" />, label: 'Asesor de Cryptos' },
   ];
 
   return (

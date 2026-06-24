@@ -60,18 +60,26 @@ const runTechnicalForecast = async (req, res) => {
     const cryptoData = await Crypto.findOne({ coinId });
     if (!cryptoData) return res.status(404).json({ message: 'Moneda no encontrada' });
 
-    const pythonResponse = await axios.post(`http://127.0.0.1:8000/predict/forecast/${cryptoData.symbol}`);
+    const AI_SERVICE_URL = process.env.AI_SERVICE_URL || 'http://127.0.0.1:8000';
+    const pythonResponse = await axios.post(`${AI_SERVICE_URL}/predict/forecast/${cryptoData.symbol}`);
     const mlData = pythonResponse.data;
 
-    const prompt = `Analiza técnicamente el activo ${cryptoData.name} (${cryptoData.symbol}). 
-    La red neuronal proyecta una tendencia técnica general ${mlData.trend}. Precio actual: $${cryptoData.price}. 
-    Redacta una conclusión técnica a corto y mediano plazo, directa y compacta en un solo párrafo. PROHIBIDO usar asteriscos, negritas o formato markdown.`;
-    
-    const aiConclusion = await analyzeGeopoliticalScenario(prompt);
+    let aiConclusion = '';
+    try {
+      const prompt = `Analiza técnicamente el activo ${cryptoData.name} (${cryptoData.symbol}). 
+      La red neuronal proyecta una tendencia técnica general ${mlData.trend}. Precio actual: $${cryptoData.price}. 
+      Redacta una conclusión técnica a corto y mediano plazo, directa y compacta en un solo párrafo. PROHIBIDO usar asteriscos, negritas o formato markdown.`;
+      
+      aiConclusion = await analyzeGeopoliticalScenario(prompt);
+      aiConclusion = aiConclusion.replace(/\*/g, '');
+    } catch (aiError) {
+      console.warn('[Gemini AI Fallback]:', aiError.message);
+      aiConclusion = `La red neuronal detecta una tendencia ${mlData.trend}. (El redactor de IA está experimentando alta demanda y no pudo generar el análisis detallado).`;
+    }
 
     return res.status(200).json({
       predictions: mlData.predictions,
-      aiConclusion: aiConclusion.replace(/\*/g, '') 
+      aiConclusion: aiConclusion 
     });
 
   } catch (error) {
