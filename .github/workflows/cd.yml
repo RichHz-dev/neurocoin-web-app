@@ -1,0 +1,38 @@
+name: Despliegue Continuo (CD) en AWS
+
+on:
+  push:
+    branches: [ main ] # El robot solo se activará cuando los cambios se unan a la rama principal
+
+jobs:
+  deploy:
+    name: Desplegar en Servidor EC2
+    runs-on: ubuntu-latest
+
+    steps:
+    # 1. Clonar el código más reciente en la máquina del robot
+    - name: Clonar Repositorio
+      uses: actions/checkout@v4
+
+    # 2. Conectarse a AWS y ejecutar los comandos de Docker
+    - name: Conectarse por SSH y Actualizar Contenedores
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.SSH_HOST }}
+        username: ${{ secrets.SSH_USER }}
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        script: |
+          # 1. Crear la red compartida si no existe en el servidor
+          docker network create neurocoin_network 2>/dev/null || true
+          
+          # 2. Si la carpeta del proyecto ya existe, entrar y actualizar. Si no, clonarla.
+          if [ -d "neurocoin-web-app" ]; then
+            cd neurocoin-web-app
+            git pull origin main
+          else
+            git clone https://github.com/${{ github.repository }}.git
+            cd neurocoin-web-app
+          fi
+          
+          # 3. Levantar los contenedores con la última versión del código
+          docker compose up -d --build
