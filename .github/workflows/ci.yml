@@ -26,9 +26,6 @@ jobs:
     - name: Construir imágenes de Docker
       run: docker compose build
 
-    - name: Crear red compartida de Docker
-      run: docker network create neurocoin_network
-
     # 4. Encender los contenedores para comprobar que no explotan
     - name: Probar arranque de contenedores
       run: docker compose up -d
