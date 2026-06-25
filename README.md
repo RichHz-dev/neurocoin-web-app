@@ -42,3 +42,7 @@ docker compose up -d --build
 ```bash
     docker compose down
 ```
+
+
+## SERVIDOR AWS DESDE LA TERMINAL 
+ssh -i "neurocoin-key.pem" ubuntu@18.116.242.109

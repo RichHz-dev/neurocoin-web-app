@@ -35,8 +35,11 @@ jobs:
           # 1. Crear la red compartida de Docker si no existe
           docker network create neurocoin_network 2>/dev/null || true
           
-          # 2. Entrar a la carpeta donde el robot acaba de dejar los archivos
+          # 2. Entrar a la carpeta
           cd neurocoin-web-app
           
-          # 3. Reconstruir y encender los contenedores actualizados
+          # 3. Crear el archivo .env en el backend con el secret de github
+          echo "${{ secrets.BACKEND_ENV }}" > backend/.env
+          
+          # 4. Reconstruir y encender los contenedores actualizados
           docker compose up -d --build
