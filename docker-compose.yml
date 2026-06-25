@@ -6,7 +6,7 @@ services:
     ports:
       - "5000:5000"   
     environment:
-      - AI_SERVICE_URL=http://ai-service:8000
+      - AI_SERVICE_URL=http://neurocoin_ai_service:8000
     env_file:
       - ./backend/.env 
     networks:
