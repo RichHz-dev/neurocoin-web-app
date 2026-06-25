@@ -39,7 +39,7 @@ jobs:
           cd neurocoin-web-app
           
           # 3. Crear el archivo .env en el backend con el secret de github
-          echo "${{ secrets.BACKEND_ENV }}" > backend/.env
+          echo "${{ secrets.ENV_BACKEND }}" > backend/.env
           
           # 4. Reconstruir y encender los contenedores actualizados
           docker compose up -d --build
