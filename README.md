@@ -45,4 +45,9 @@ docker compose up -d --build
 
 
 ## SERVIDOR AWS DESDE LA TERMINAL 
+
+**1. Activar la consola aws** 
 ssh -i "neurocoin-key.pem" ubuntu@18.116.242.109
+
+
+docker logs --tail 20 neurocoin_backend
