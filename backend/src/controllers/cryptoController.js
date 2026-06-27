@@ -1,7 +1,8 @@
 const Crypto = require('../models/Crypto');
 const SupportedCrypto = require('../models/SupportedCrypto');
 const axios = require('axios');
-const { analyzeGeopoliticalScenario } = require('../services/geminiService');
+const { analyzeGeopoliticalScenario, analyzeTechnicalForecast } = require('../services/geminiService');
+
 
 // Obtener las y la crypto moneda => FRONTEND
 const getCryptos = async (req, res) => {
@@ -43,7 +44,6 @@ const getCryptoHistory = async (req, res) => {
       default: interval = '1m'; limit = 60;
     }
 
-    // Cambiamos 'ticker/24hr' por 'klines'
     const response = await axios.get(`https://api.binance.us/api/v3/klines`, {
       params: { symbol: supported.binanceSymbol, interval, limit }
     });
@@ -67,15 +67,16 @@ const runTechnicalForecast = async (req, res) => {
 
     let aiConclusion = '';
     try {
-      const prompt = `Analiza técnicamente el activo ${cryptoData.name} (${cryptoData.symbol}). 
-      La red neuronal proyecta una tendencia técnica general ${mlData.trend}. Precio actual: $${cryptoData.price}. 
-      Redacta una conclusión técnica a corto y mediano plazo, directa y compacta en un solo párrafo. PROHIBIDO usar asteriscos, negritas o formato markdown.`;
-      
-      aiConclusion = await analyzeGeopoliticalScenario(prompt);
-      aiConclusion = aiConclusion.replace(/\*/g, '');
+      // Llamamos a la nueva función pasándole los parámetros limpios directamente
+      aiConclusion = await analyzeTechnicalForecast(
+        cryptoData.name, 
+        cryptoData.symbol, 
+        mlData.trend, 
+        cryptoData.price
+      );
     } catch (aiError) {
       console.warn('[Gemini AI Fallback]:', aiError.message);
-      aiConclusion = `La red neuronal detecta una tendencia ${mlData.trend}. (El redactor de IA está experimentando alta demanda y no pudo generar el análisis detallado).`;
+      aiConclusion = `La red neuronal detecta una tendencia ${mlData.trend}. (El analista de IA está experimentando alta demanda y no pudo generar el resumen detallado).`;
     }
 
     return res.status(200).json({

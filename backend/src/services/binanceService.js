@@ -16,7 +16,7 @@ const fetchAndUpdateMarketData = async () => {
     const targetSymbols = supportedList.map(item => item.binanceSymbol);
 
     // Llamada a la api de Binance
-    const response = await axios.get('https://api.binance.com/api/v3/ticker/24hr');
+    const response = await axios.get('https://api.binance.us/api/v3/klines');
     const allTickers = response.data;
 
     // Filtrar los tickers que coincidan con nuestra DB
