@@ -38,14 +38,13 @@ docker compose up -d --build
 ```bash
     docker ps 
 ```
-* Detener Infraestructura
+* Detener contenedores 
 ```bash
     docker compose down
 ```
 
 
 ## SERVIDOR AWS DESDE LA TERMINAL 
-
 **1. Activar la consola aws** 
 ssh -i "neurocoin-key.pem" ubuntu@18.116.242.109
 
