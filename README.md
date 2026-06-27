@@ -51,3 +51,15 @@ ssh -i "neurocoin-key.pem" ubuntu@18.116.242.109
 
 
 docker logs --tail 20 neurocoin_backend
+
+
+http://18.116.242.109:5000
+
+
+
+Cambiar api key
+nano ~/neurocoin-web-app/backend/.env
+guardar con Ctrl + O, Enter, y salir con Ctrl + X
+
+cd ~/neurocoin-web-app
+docker compose restart backend
