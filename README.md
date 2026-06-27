@@ -50,7 +50,7 @@ docker compose up -d --build
 ssh -i "neurocoin-key.pem" ubuntu@18.116.242.109
 
 
-docker logs --tail 20 neurocoin_backend
+docker logs --tail 50 neurocoin_backend
 
 
 http://18.116.242.109:5000

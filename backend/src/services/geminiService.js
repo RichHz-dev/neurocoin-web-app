@@ -66,6 +66,54 @@ const analyzeGeopoliticalScenario = async (userScenario) => {
   }
 };
 
+// Dedicada exclusivamente al análisis técnico de las gráficas
+const analyzeTechnicalForecast = async (assetName, assetSymbol, trend, price) => {
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (!apiKey || apiKey === 'tu_clave_de_gemini_aqui') {
+    throw new Error('La GEMINI_API_KEY no está configurada en el .env');
+  }
+
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+
+  const systemInstruction = `
+    Eres el "Analista Técnico Cuantitativo de NeuroCoin". Tu única tarea es interpretar brevemente la proyección matemática hecha por nuestra red neuronal (LSTM) para un activo financiero.
+    Debes redactar una conclusión técnica directa, compacta y profesional en UN SOLO PÁRRAFO de máximo 70 palabras.
+    REGLA ABSOLUTA Y ESTRICTA: Está PROHIBIDO usar formato Markdown. No uses asteriscos (*), ni numerales (#), ni negritas. Debe ser texto totalmente plano y limpio.
+  `;
+
+  const requestBody = {
+    contents: [{ 
+      role: 'user', 
+      parts: [{ text: `Analiza técnicamente el activo ${assetName} (${assetSymbol}). La red neuronal proyecta una tendencia técnica general ${trend}. El precio actual es $${price}. Genera el dictamen a corto y mediano plazo.` }] 
+    }],
+    systemInstruction: { parts: [{ text: systemInstruction }] },
+    generationConfig: {
+      temperature: 0.5, // Menor temperatura = respuestas más estables y profesionales
+      maxOutputTokens: 250
+    }
+  };
+
+  const MAX_RETRIES = 3;
+  for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+    try {
+      const response = await axios.post(url, requestBody);
+      if (!response.data.candidates || !response.data.candidates[0].content) {
+        throw new Error('Gemini devolvió una respuesta vacía');
+      }
+      let aiResponse = response.data.candidates[0].content.parts[0].text;
+      return aiResponse.replace(/[*#_]/g, '').trim(); // Limpieza de seguridad
+    } catch (error) {
+      const statusCode = error.response ? error.response.status : null;
+      if ((statusCode === 503 || statusCode === 429) && attempt < MAX_RETRIES) {
+        await delay(attempt * 2000);
+        continue;
+      }
+      console.error('[CRITICO] Error definitivo en analyzeTechnicalForecast:', error.message);
+      throw new Error('Servicio ocupado.');
+    }
+  }
+};
+
 const chatWithAdvisor = async (userMessage, previousMessages = []) => {
   try {
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
@@ -126,4 +174,4 @@ const chatWithAdvisor = async (userMessage, previousMessages = []) => {
 };
 
 
-module.exports = { analyzeGeopoliticalScenario, chatWithAdvisor };
+module.exports = { analyzeGeopoliticalScenario, chatWithAdvisor, analyzeTechnicalForecast };
