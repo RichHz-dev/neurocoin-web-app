@@ -44,7 +44,7 @@ const getCryptoHistory = async (req, res) => {
       default: interval = '1m'; limit = 60;
     }
 
-    const response = await axios.get(`https://api.binance.com/api/v3/klines`, {
+    const response = await axios.get(`https://api.binance.us/api/v3/klines`, {
       params: { symbol: supported.binanceSymbol, interval, limit }
     });
 
