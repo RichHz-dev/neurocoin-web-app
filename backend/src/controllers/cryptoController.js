@@ -4,7 +4,7 @@ const axios = require('axios');
 const { analyzeGeopoliticalScenario, analyzeTechnicalForecast } = require('../services/geminiService');
 
 
-// Obtener las y la crypto moneda => FRONTEND
+// Obtener las y la crypto moneda
 const getCryptos = async (req, res) => {
   try {
     const cryptos = await Crypto.find({});

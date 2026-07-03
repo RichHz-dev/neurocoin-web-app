@@ -65,10 +65,6 @@ const checkAllAlerts = async () => {
         console.log(`[ALERT DISPARADA] ${alert.coinName} cruzó el umbral de ${alert.value}. Precio actual: ${crypto.price}`);
         
         await alert.save();
-
-        // Implementacion de WebSockets (Socket.io) para avisarle al frontend como notificaciones las alertas disparadas
-
-
       }
     }
   } catch (error) {

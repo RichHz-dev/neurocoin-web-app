@@ -107,7 +107,7 @@ const analyzeTechnicalForecast = async (assetName, assetSymbol, trend, price) =>
     throw new Error("Respuesta incompleta detectada");
 
   } catch (error) {
-    // 🔥 PLAN B: Conclusión matemática automatizada (Fallback local a prueba de fallos)
+    // Conclusión matemática automatizada (Fallback local a prueba de fallos)
     // Si Google censura, el servidor responde con esto instantáneamente. Tu frontend jamás se enterará del corte.
     console.log("[Aviso] Filtro de Google activado o error. Aplicando conclusión local de respaldo.");
     

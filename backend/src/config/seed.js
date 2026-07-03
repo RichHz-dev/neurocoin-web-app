@@ -6,7 +6,7 @@ const seedSupportedCryptos = async () => {
     // --- SEED DE CRIPTOMONEDAS ---
     const cryptoCount = await SupportedCrypto.countDocuments();
     if (cryptoCount === 0) {
-      console.log('🌱 Poblando monedas iniciales...');
+      console.log('[INFO] Poblando monedas iniciales...');
       const initialCryptos = [
         { binanceSymbol: 'BTCUSDT', coinId: 'bitcoin', name: 'Bitcoin', symbol: 'BTC', circulatingSupply: 19800000 },
         { binanceSymbol: 'ETHUSDT', coinId: 'ethereum', name: 'Ethereum', symbol: 'ETH', circulatingSupply: 120000000 },
@@ -20,7 +20,7 @@ const seedSupportedCryptos = async () => {
     // --- ◄ NUEVO: SEED DE ESCENARIOS PREDEFINIDOS ---
     const scenarioCount = await Scenario.countDocuments({ isPredefined: true });
     if (scenarioCount === 0) {
-      console.log('🌱 Poblando escenarios predefinidos para la interfaz...');
+      console.log('{INFO] Poblando escenarios predefinidos para la interfaz...');
       const defaultScenarios = [
         {
           title: "Crisis Energética e Hashrate",
@@ -45,11 +45,11 @@ const seedSupportedCryptos = async () => {
         }
       ];
       await Scenario.insertMany(defaultScenarios);
-      console.log('✅ Escenarios de fábrica inyectados con éxito.');
+      console.log('{INFO] Escenarios de fábrica inyectados con éxito.');
     }
 
   } catch (error) {
-    console.error('❌ Error al ejecutar el seed:', error.message);
+    console.error('[ERROR] Al ejecutar el seed:', error.message);
   }
 };
 

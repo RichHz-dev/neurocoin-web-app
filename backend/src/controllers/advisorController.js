@@ -20,10 +20,10 @@ const askQuestion = async (req, res) => {
       });
     }
 
-    // 2. Extraer historial viejo (para dárselo a Gemini) y guardar el nuevo mensaje del usuario
+    // 2. Extraer historial viejo y guardar el nuevo mensaje del usuario
     const previousMessages = chat.messages;
     chat.messages.push({ sender: 'user', text: message });
-    await chat.save(); // Guardamos rápido para no perderlo si la IA falla
+    await chat.save(); // Guardamos para no perderlo si la IA falla
 
     // 3. Consultar a Gemini pasándole el historial
     const aiResponseText = await chatWithAdvisor(message, previousMessages);

@@ -21,9 +21,9 @@ connectDB();
 // Registro de Rutas
 app.use('/api/cryptos', cryptoRoutes);
 app.use('/api/alerts', alertRoutes);
-app.use('/api/ai', aiRoutes);                     // Probamos el agente de IA
+app.use('/api/ai', aiRoutes);                    
 app.use('/api/scenarios', scenarioRoutes); 
-app.use('/api/advisor', advisorRoutes);           // Asesor de IA
+app.use('/api/advisor', advisorRoutes);           
 
 
 const PORT = process.env.PORT || 5000;
