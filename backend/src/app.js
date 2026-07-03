@@ -31,13 +31,6 @@ const PORT = process.env.PORT || 5000;
 app.listen(PORT, async () => {
   console.log(`\n[INFO] Servidor de NeuroCoin corriendo en el puerto ${PORT}`);
 
-  // try {
-  //   // 3. Ejecución del Seed: Revisa e inyecta las monedas y escenarios base si la BD está vacía
-  //   console.log('[INFO] Verificando datos iniciales de la base de datos...');
-  //   await seedSupportedCryptos(); 
-  // } catch (seedError) {
-  //   console.error('[ERROR] Al procesar el seed inicial:', seedError.message);
-  // }
 
   // Ejecución inicial del motor de mercado
   await runMarketEngine();
@@ -45,5 +38,5 @@ app.listen(PORT, async () => {
   // Tarea automatizada: Consulta a Binance cada 10 segundos para actualizar precios y sparklines
   setInterval(async () => {
     await runMarketEngine();
-  }, 4000);
+  }, 5000);
 });
