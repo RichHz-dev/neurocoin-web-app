@@ -106,3 +106,7 @@ guardar con Ctrl + O, Enter, y salir con Ctrl + X
 
 cd ~/neurocoin-web-app
 docker compose restart backend
+
+
+
+ssh -i "neurocoin-frankfurt.pem" ec2-user@35.159.123.31
