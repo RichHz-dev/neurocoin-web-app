@@ -42,4 +42,4 @@ jobs:
           echo "${{ secrets.ENV_BACKEND }}" > backend/.env
           
           # 4. Reconstruir y encender los contenedores actualizados
-          docker compose up -d --build
+          docker-compose up -d --build
