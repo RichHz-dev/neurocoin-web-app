@@ -110,3 +110,10 @@ docker compose restart backend
 
 
 ssh -i "neurocoin-frankfurt.pem" ec2-user@35.159.123.31
+
+
+docker-compose up -d --build
+
+docker logs --tail 50 neurocoin_backend
+
+http://35.159.123.31
