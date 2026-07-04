@@ -6,7 +6,7 @@ const connectDB = async () => {
     console.log('\n[INFO] Intentando conectar a MongoDB Atlas...');
     await mongoose.connect(process.env.MONGO_URI_ATLAS);
     console.log('====== MongoDB ATLAS Conectado Exitosamente ======');
-    return; // Si funciona, salimos de la función felizmente
+    return; // Si funciona, salimos de la función
   } catch (atlasError) {
     console.error('[ERROR] Al conectar a MongoDB Atlas:', atlasError.message);
     console.log('\n[INFO] Iniciando protocolo de contingencia...');

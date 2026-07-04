@@ -4,7 +4,7 @@ const HistorySimulation = require('../models/HistorySimulation');
 const { analyzeGeopoliticalScenario } = require('../services/geminiService');
 const axios = require('axios');
 
-// Obtener escenarios (predefinidos) => ADMIN
+// Obtener escenarios (predefinidos)
 const getScenarios = async (req, res) => {
   try {
     const scenarios = await Scenario.find().sort({ isPredefined: -1, createdAt: -1 });
@@ -14,7 +14,7 @@ const getScenarios = async (req, res) => {
   }
 };
 
-// Crear nuevos escenarios para mostrar => ADMIN
+// Crear nuevos escenarios para mostrar
 const createScenario = async (req, res) => {
   try {
     const { title, type, impact, description } = req.body;
@@ -38,7 +38,7 @@ const createScenario = async (req, res) => {
   }
 };
 
-// Ejecutar simulación matemática + conclusion IA => FRONTEND
+// Ejecutar simulación matemática + conclusion IA 
 const runScenarioSimulation = async (req, res) => {
   try {
     const { userId, coinId, contextType, expectedImpact, description } = req.body;
@@ -55,7 +55,7 @@ const runScenarioSimulation = async (req, res) => {
       };
       
       const AI_SERVICE_URL = process.env.AI_SERVICE_URL || 'http://127.0.0.1:8000';
-      console.log(`\n🚀 [NODE] Enviando payload a Python (${AI_SERVICE_URL}/predict/scenario/${cryptoData.symbol}):`);
+      console.log(`\n[NODE] Enviando payload a Python (${AI_SERVICE_URL}/predict/scenario/${cryptoData.symbol}):`);
       console.log(JSON.stringify(pythonPayload, null, 2));
 
       const pythonResponse = await axios.post(`${AI_SERVICE_URL}/predict/scenario/${cryptoData.symbol}`, pythonPayload);

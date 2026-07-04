@@ -11,10 +11,10 @@ const fetchAndUpdateMarketData = async () => {
       return;
     }
 
-    // Crear una lista de símbolos para filtrar rápido (ej: ['BTCUSDT', 'ETHUSDT'])
+    // Crear una lista de símbolos para filtrar mejor
     const targetSymbols = supportedList.map(item => item.binanceSymbol);
 
-    // 🔥 CORRECCIÓN: Usamos el endpoint global de tickers de 24 horas
+    // Usamos el endpoint global de tickers de 24 horas
     console.log('[INFO] Consultando precios en tiempo real a Binance...');
     const response = await axios.get('https://api.binance.com/api/v3/ticker/24hr');
     const allTickers = response.data;

@@ -21,7 +21,6 @@ const createAlert = async (req, res) => {
  
 const getAlerts = async (req, res) => {
   try {
-    // En el futuro, aquí filtrarías por el ID del usuario autenticado: { userId: req.user.id }
     const alerts = await Alert.find({}).sort({ createdAt: -1 }); // Muestra las más recientes primero
     return res.status(200).json(alerts);
   } catch (error) {
